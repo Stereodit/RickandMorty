@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#76FAFF</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/rick_sanchez</item>
+        <item name="postSplashScreenTheme">@style/Theme.RickAndMorty</item>
+
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>
