@@ -1,7 +1,9 @@
 package com.example.rickandmorty.ui.core.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +26,9 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -46,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -92,8 +98,10 @@ fun CharactersScreen(
     var isActive by remember {
         mutableStateOf(false)
     }
+
     var checked by remember { mutableStateOf(false) }
-    var selectedFilters by remember { mutableStateOf(Filters.SelectedCharacterFilters("", "", "")) }
+    val selectedFilters by remember { mutableStateOf(Filters.SelectedCharacterFilters("", "", "")) }
+
     val focusManager = LocalFocusManager.current
     val pullRefreshState = rememberPullRefreshState(
         refreshing = characters.loadState.refresh is LoadState.Loading,
@@ -171,17 +179,13 @@ fun CharactersScreen(
                             onCheckedChange = {
                                 checked = it
                                 if (it) {
-                                    charactersViewModel.setFilterStatus(selectedFilters.status)
-                                    charactersViewModel.setFilterSpecies(selectedFilters.species)
-                                    charactersViewModel.setFilterGender(selectedFilters.gender)
-                                    charactersViewModel.setIsActiveFilters(true)
+                                    charactersViewModel.filterStatus = selectedFilters.status
+                                    charactersViewModel.filterSpecies = selectedFilters.species
+                                    charactersViewModel.filterGender = selectedFilters.gender
                                 } else {
-                                    selectedFilters.status = ""
-                                    selectedFilters.species = ""
-                                    selectedFilters.gender = ""
-                                    charactersViewModel.setFilterStatus("")
-                                    charactersViewModel.setFilterSpecies("")
-                                    charactersViewModel.setFilterGender("")
+                                    charactersViewModel.filterStatus = ""
+                                    charactersViewModel.filterSpecies = ""
+                                    charactersViewModel.filterGender = ""
                                 }
                             },
                             modifier = Modifier
@@ -256,7 +260,7 @@ fun FiltersCard(
         Column(
             modifier = Modifier.padding(4.dp)
         ) {
-            Text(text = "Status:", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+            Text(text = "Status:", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp))
             LazyRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -264,15 +268,26 @@ fun FiltersCard(
                     .fillMaxWidth()
             ) {
                 items(filters.status.size) {
-                    OutlinedButton(
-                        onClick = { selectedFilters.status = filters.status[it] },
-                        modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                    var selected = selectedFilters.status == filters.status[it]
+                    Box(
+                        modifier = Modifier
+                            .border(BorderStroke(1.dp, Color.Gray), RoundedCornerShape(20.dp))
+                            .padding(4.dp)
                     ) {
-                        Text(text = filters.status[it])
+                        Text(
+                            text = filters.status[it],
+                            fontSize = 12.sp,
+                            color = Color.Blue,
+                            modifier = Modifier
+                                .padding(top = 4.dp, bottom = 4.dp, start = 12.dp, end = 12.dp)
+                        )
+                    }
+                    if (filters.status.lastIndex != it) {
+                        Spacer(modifier = Modifier.defaultMinSize(minWidth = 8.dp))
                     }
                 }
             }
-            Text(text = "Species:", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+            Text(text = "Species:", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp))
             LazyRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -288,7 +303,7 @@ fun FiltersCard(
                     }
                 }
             }
-            Text(text = "Gender:", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+            Text(text = "Gender:", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp))
             LazyRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,

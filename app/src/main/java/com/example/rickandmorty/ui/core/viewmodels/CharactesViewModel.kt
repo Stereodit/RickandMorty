@@ -25,18 +25,16 @@ class CharactersViewModel(
 ) : ViewModel() {
 
     var charactersFlow: Flow<PagingData<Character>>
-    val isActiveFilters = MutableStateFlow(false)
     val searchByName = MutableStateFlow("")
-    private var filterStatus = ""
-    private var filterSpecies = ""
-    private var filterGender = ""
+    var filterStatus = ""
+    var filterSpecies = ""
+    var filterGender = ""
 
     init {
         charactersFlow = searchByName.asStateFlow()
             .debounce(500)
             .flatMapLatest {
-                if(isActiveFilters.value) rickAndMortyRepository.getFilteredPagedCharacters(it, filterStatus, filterSpecies, filterGender)
-                    else rickAndMortyRepository.getFilteredPagedCharacters(it, "", "", "")
+                rickAndMortyRepository.getFilteredPagedCharacters(it, filterStatus, filterSpecies, filterGender)
             }
             .cachedIn(viewModelScope)
     }
@@ -44,26 +42,6 @@ class CharactersViewModel(
     fun setSearchByName(value: String) {
         if (this.searchByName.value == value) return
         this.searchByName.value = value
-    }
-
-    fun setIsActiveFilters(value: Boolean) {
-        if (this.isActiveFilters.value == value) return
-        this.isActiveFilters.value = value
-    }
-
-    fun setFilterStatus(value: String) {
-        if (this.filterStatus == value) return
-        this.filterStatus = value
-    }
-
-    fun setFilterSpecies(value: String) {
-        if (this.filterSpecies == value) return
-        this.filterSpecies = value
-    }
-
-    fun setFilterGender(value: String) {
-        if (this.filterGender == value) return
-        this.filterGender = value
     }
 
     companion object {
