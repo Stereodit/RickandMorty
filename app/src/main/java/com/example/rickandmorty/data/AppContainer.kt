@@ -1,5 +1,9 @@
 package com.example.rickandmorty.data
 
+import android.app.Application
+import android.content.Context
+import androidx.room.Room
+import com.example.rickandmorty.data.local.RickAndMortyDatabase
 import com.example.rickandmorty.data.remote.RickAndMortyApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -22,7 +26,26 @@ class DefaultAppContainer : AppContainer {
         retrofit.create(RickAndMortyApiService::class.java)
     }
 
+    companion object {
+        @Volatile
+        private var INSTANCE: RickAndMortyDatabase? = null
+
+        fun getDatabase(context: Context): RickAndMortyDatabase {
+            val tempInstance = INSTANCE
+            if (tempInstance != null) {
+                return tempInstance
+            }
+            synchronized(this) {
+                val instance = Room.databaseBuilder(context.applicationContext,
+                    RickAndMortyDatabase::class.java, "jetpack")
+                    .build()
+                INSTANCE = instance
+                return instance
+            }
+        }
+    }
+
     override val rickAndMortyRepository: RickAndMortyRepository by lazy {
-        NetworkRickAndMortyRepository(retrofitService)
+        NetworkRickAndMortyRepository(rickAndMortyApiService = retrofitService)
     }
 }

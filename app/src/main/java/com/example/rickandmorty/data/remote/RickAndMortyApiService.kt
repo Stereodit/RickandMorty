@@ -1,6 +1,5 @@
 package com.example.rickandmorty.data.remote
 
-import com.example.rickandmorty.data.models.CharactersSet
 import com.example.rickandmorty.data.models.EpisodesSet
 import com.example.rickandmorty.data.models.LocationsSet
 import retrofit2.http.GET
@@ -10,7 +9,7 @@ interface RickAndMortyApiService {
     @GET("character/")
     suspend fun getCharactersByPage(
         @Query("page") page: Int,
-        @Query("name") name: String,
+//        @Query("name") name: String,
     ): CharactersSet
 
     @GET("character/")

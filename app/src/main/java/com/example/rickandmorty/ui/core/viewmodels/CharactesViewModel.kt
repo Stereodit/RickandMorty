@@ -1,6 +1,5 @@
 package com.example.rickandmorty.ui.core.viewmodels
 
-import android.text.BoringLayout
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -10,7 +9,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.rickandmorty.RickAndMortyApplication
 import com.example.rickandmorty.data.RickAndMortyRepository
-import com.example.rickandmorty.data.models.Character
+import com.example.rickandmorty.data.remote.Character
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +24,7 @@ class CharactersViewModel(
 ) : ViewModel() {
 
     var charactersFlow: Flow<PagingData<Character>>
-    val searchByName = MutableStateFlow("")
+    var searchByName = MutableStateFlow("")
     var filterStatus = ""
     var filterSpecies = ""
     var filterGender = ""

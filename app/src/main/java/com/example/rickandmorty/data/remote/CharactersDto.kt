@@ -1,5 +1,6 @@
-package com.example.rickandmorty.data.models
+package com.example.rickandmorty.data.remote
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,7 +20,8 @@ data class CharactersInfo(
 @Serializable
 data class Character(
     val created: String,
-    val episode: List<String>,
+    @SerialName(value = "episode")
+    val episodes: List<String>,
     val gender: String,
     val id: Int,
     val image: String,

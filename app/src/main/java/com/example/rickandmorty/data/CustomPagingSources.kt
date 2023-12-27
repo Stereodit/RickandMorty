@@ -2,14 +2,11 @@ package com.example.rickandmorty.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.rickandmorty.data.mock.MockData
-import com.example.rickandmorty.data.models.Character
+import com.example.rickandmorty.data.remote.Character
 import com.example.rickandmorty.data.models.Episode
 import com.example.rickandmorty.data.models.Location
 import com.example.rickandmorty.data.remote.RickAndMortyApiService
-import kotlinx.coroutines.delay
 import retrofit2.HttpException
-import retrofit2.Retrofit
 
 class CharactersFilteredPagingSource(
     private val apiSource: RickAndMortyApiService,

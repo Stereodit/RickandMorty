@@ -2,7 +2,7 @@ package com.example.rickandmorty.ui.core.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,13 +13,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -27,17 +24,14 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -45,18 +39,17 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.enableLiveLiterals
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -66,14 +59,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
-import androidx.paging.LoadStates
-import androidx.paging.PagingSource
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.rickandmorty.R
 import com.example.rickandmorty.data.mock.MockData
-import com.example.rickandmorty.data.models.Character
+import com.example.rickandmorty.data.remote.Character
 import com.example.rickandmorty.data.models.Filters
 import com.example.rickandmorty.ui.core.ErrorLazyGrid
 import com.example.rickandmorty.ui.core.ErrorScreen
@@ -82,7 +73,6 @@ import com.example.rickandmorty.ui.core.LoadingScreen
 import com.example.rickandmorty.ui.core.NotFoundScreen
 import com.example.rickandmorty.ui.core.viewmodels.CharactersViewModel
 import com.example.rickandmorty.ui.theme.RickAndMortyTheme
-import retrofit2.HttpException
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -128,7 +118,6 @@ fun CharactersScreen(
                             charactersViewModel.setSearchByName(searchText)
                         },
                         onSearch = {
-                            isActive = false
                             focusManager.clearFocus()
                         },
                         active = false,
@@ -182,10 +171,18 @@ fun CharactersScreen(
                                     charactersViewModel.filterStatus = selectedFilters.status
                                     charactersViewModel.filterSpecies = selectedFilters.species
                                     charactersViewModel.filterGender = selectedFilters.gender
+                                    charactersViewModel.searchByName.value += " "
+                                    charactersViewModel.searchByName.value.trimEnd()
                                 } else {
                                     charactersViewModel.filterStatus = ""
                                     charactersViewModel.filterSpecies = ""
                                     charactersViewModel.filterGender = ""
+                                    selectedFilters.status = ""
+                                    selectedFilters.species = ""
+                                    selectedFilters.gender = ""
+                                    charactersViewModel.searchByName.value += " "
+                                    charactersViewModel.searchByName.value.trimEnd()
+                                    isActive = false
                                 }
                             },
                             modifier = Modifier
@@ -195,7 +192,37 @@ fun CharactersScreen(
                 if (isActive) {
                     FiltersCard(
                         selectedFilters = selectedFilters,
-                        filters = Filters.CharacterFilters
+                        filters = Filters.CharacterFilters,
+                        selectStatus = {
+                            selectedFilters.status = it
+                            isActive = !isActive
+                            isActive = !isActive
+                            if (checked) {
+                                charactersViewModel.filterStatus = selectedFilters.status
+                                charactersViewModel.searchByName.value += " "
+                                charactersViewModel.searchByName.value.trimEnd()
+                            }
+                        },
+                        selectSpecies = {
+                            selectedFilters.species = it
+                            isActive = !isActive
+                            isActive = !isActive
+                            if (checked) {
+                                charactersViewModel.filterSpecies = selectedFilters.species
+                                charactersViewModel.searchByName.value += " "
+                                charactersViewModel.searchByName.value.trimEnd()
+                            }
+                        },
+                        selectGender = {
+                            selectedFilters.gender = it
+                            isActive = !isActive
+                            isActive = !isActive
+                            if (checked) {
+                                charactersViewModel.filterGender = selectedFilters.gender
+                                charactersViewModel.searchByName.value += " "
+                                charactersViewModel.searchByName.value.trimEnd()
+                            }
+                        }
                     )
                 }
             }
@@ -252,13 +279,16 @@ fun CharactersScreen(
 fun FiltersCard(
     modifier: Modifier = Modifier,
     selectedFilters: Filters.SelectedCharacterFilters,
-    filters: Filters.CharacterFilters
+    filters: Filters.CharacterFilters,
+    selectStatus: (String) -> Unit,
+    selectSpecies: (String) -> Unit,
+    selectGender: (String) -> Unit,
 ) {
     Card(
         modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
     ) {
         Column(
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
             Text(text = "Status:", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp))
             LazyRow(
@@ -272,14 +302,22 @@ fun FiltersCard(
                     Box(
                         modifier = Modifier
                             .border(BorderStroke(1.dp, Color.Gray), RoundedCornerShape(20.dp))
-                            .padding(4.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .selectable(
+                                selected = selected,
+                                onClick = {
+                                    if (selected) selectStatus("")
+                                    else selectStatus(filters.status[it])
+                                })
+                            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
                     ) {
                         Text(
                             text = filters.status[it],
-                            fontSize = 12.sp,
-                            color = Color.Blue,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             modifier = Modifier
-                                .padding(top = 4.dp, bottom = 4.dp, start = 12.dp, end = 12.dp)
+                                .padding(top = 10.dp, bottom = 10.dp, start = 20.dp, end = 20.dp)
                         )
                     }
                     if (filters.status.lastIndex != it) {
@@ -295,11 +333,30 @@ fun FiltersCard(
                     .fillMaxWidth()
             ) {
                 items(filters.species.size) {
-                    OutlinedButton(
-                        onClick = { selectedFilters.species = filters.species[it] },
-                        modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                    var selected = selectedFilters.species == filters.species[it]
+                    Box(
+                        modifier = Modifier
+                            .border(BorderStroke(1.dp, Color.Gray), RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(20.dp))
+                            .selectable(
+                                selected = selected,
+                                onClick = {
+                                    if (selected) selectSpecies("")
+                                    else selectSpecies(filters.species[it])
+                                })
+                            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
                     ) {
-                        Text(text = filters.species[it])
+                        Text(
+                            text = filters.species[it],
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(top = 10.dp, bottom = 10.dp, start = 20.dp, end = 20.dp)
+                        )
+                    }
+                    if (filters.species.lastIndex != it) {
+                        Spacer(modifier = Modifier.defaultMinSize(minWidth = 8.dp))
                     }
                 }
             }
@@ -311,11 +368,30 @@ fun FiltersCard(
                     .fillMaxWidth()
             ) {
                 items(filters.gender.size) {
-                    OutlinedButton(
-                        onClick = { selectedFilters.gender = filters.gender[it] },
-                        modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                    var selected = selectedFilters.gender == filters.gender[it]
+                    Box(
+                        modifier = Modifier
+                            .border(BorderStroke(1.dp, Color.Gray), RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(20.dp))
+                            .selectable(
+                                selected = selected,
+                                onClick = {
+                                    if (selected) selectGender("")
+                                    else selectGender(filters.gender[it])
+                                })
+                            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
                     ) {
-                        Text(text = filters.gender[it])
+                        Text(
+                            text = filters.gender[it],
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(top = 10.dp, bottom = 10.dp, start = 20.dp, end = 20.dp)
+                        )
+                    }
+                    if (filters.gender.lastIndex != it) {
+                        Spacer(modifier = Modifier.defaultMinSize(minWidth = 8.dp))
                     }
                 }
             }
@@ -392,20 +468,26 @@ fun CharacterCard(
     }
 }
 
-//@Preview(showBackground = false)
-//@Composable
-//fun PreviewCharacterCard() {
-//    RickAndMortyTheme {
-//        CharacterCard(
-//            character = MockData.mockCharacter,
-//        )
-//    }
-//}
+@Preview(showBackground = false)
+@Composable
+fun PreviewCharacterCard() {
+    RickAndMortyTheme {
+        CharacterCard(
+            character = MockData.mockCharacter,
+        )
+    }
+}
 
 @Preview(showBackground = false)
 @Composable
 fun PreviewFilterCard() {
     RickAndMortyTheme {
-        FiltersCard(selectedFilters = Filters.SelectedCharacterFilters("", "", ""), filters = Filters.CharacterFilters)
+        FiltersCard(
+            selectedFilters = Filters.SelectedCharacterFilters("", "", ""),
+            filters = Filters.CharacterFilters,
+            selectStatus = {},
+            selectSpecies = {},
+            selectGender = {}
+        )
     }
 }
