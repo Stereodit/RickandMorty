@@ -2,9 +2,9 @@ package com.example.rickandmorty.data.local
 
 import com.example.rickandmorty.data.remote.Character
 import com.example.rickandmorty.data.remote.CharacterLocation
-import com.example.rickandmorty.data.remote.Origin
+import com.example.rickandmorty.data.remote.CharacterOrigin
 
-fun Character.toFullInfoCharacter(): FullInfoCharacter {
+fun Character.toFullInfoCharacter(page: Int): FullInfoCharacter {
     return FullInfoCharacter(
         characterEntity = CharacterEntity(
             id = id,
@@ -15,7 +15,8 @@ fun Character.toFullInfoCharacter(): FullInfoCharacter {
             species = species,
             status = status,
             type = type,
-            url = url
+            url = url,
+            page = page
         ),
         location = CharacterLocationEntity(
             characterOwnerId = id,
@@ -27,14 +28,14 @@ fun Character.toFullInfoCharacter(): FullInfoCharacter {
             name = this.origin.name,
             url = this.origin.url
         ),
-        episodes = episodes.toEntityEpisode(id)
+        episode = episode.toEntityEpisode(id)
     )
 }
 
 fun FullInfoCharacter.toCharacterDto(): Character {
     return Character(
         created = characterEntity.created,
-        episodes = episodes.toStringList(),
+        episode = episode.toStringList(),
         gender = characterEntity.gender,
         id = characterEntity.id,
         image = characterEntity.image,
@@ -43,7 +44,7 @@ fun FullInfoCharacter.toCharacterDto(): Character {
             url = location.url
         ),
         name = characterEntity.name,
-        origin = Origin(
+        origin = CharacterOrigin(
             name = origin.name,
             url = origin.url
         ),
@@ -60,7 +61,7 @@ private fun List<CharacterEpisodeEntity>.toStringList(): List<String> {
     return list.toList()
 }
 
-private fun List<String>.toEntityEpisode(characterId: Int): List<CharacterEpisodeEntity> {
+fun List<String>.toEntityEpisode(characterId: Int): List<CharacterEpisodeEntity> {
     var list: MutableList<CharacterEpisodeEntity> = mutableListOf()
     this.forEach { list.add(CharacterEpisodeEntity(characterOwnerId = characterId, url = it)) }
     return list.toList()

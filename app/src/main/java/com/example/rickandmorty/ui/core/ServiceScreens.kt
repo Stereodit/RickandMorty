@@ -74,7 +74,7 @@ fun NotFoundScreen(modifier: Modifier = Modifier) {
             modifier = modifier
                 .size(100.dp)
                 .padding(bottom = 4.dp),
-            painter = painterResource(R.drawable.baseline_image_search_24),
+            painter = painterResource(R.drawable.ic_not_found_image),
             contentDescription = stringResource(R.string.nothing_was_found),
         )
         Text(text = stringResource(R.string.nothing_was_found))

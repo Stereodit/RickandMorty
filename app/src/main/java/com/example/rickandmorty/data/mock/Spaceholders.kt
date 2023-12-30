@@ -1,10 +1,10 @@
 package com.example.rickandmorty.data.mock
 
-import com.example.rickandmorty.data.remote.Character
-import com.example.rickandmorty.data.remote.CharacterLocation
 import com.example.rickandmorty.data.models.Episode
 import com.example.rickandmorty.data.models.Location
-import com.example.rickandmorty.data.remote.Origin
+import com.example.rickandmorty.data.remote.Character
+import com.example.rickandmorty.data.remote.CharacterLocation
+import com.example.rickandmorty.data.remote.CharacterOrigin
 
 object MockData {
     val mockCharacter = Character(
@@ -14,10 +14,10 @@ object MockData {
         species = "Human",
         type = "",
         gender = "Male",
-        origin = Origin("Earth", ""),
+        origin = CharacterOrigin("Earth", ""),
         location = CharacterLocation("Earth", ""),
         image = "",
-        episodes = listOf("", ""),
+        episode = listOf("", ""),
         url = "",
         created = "2017-11-04T18:50:21.651Z"
     )

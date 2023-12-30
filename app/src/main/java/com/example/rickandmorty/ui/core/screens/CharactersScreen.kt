@@ -138,7 +138,7 @@ fun CharactersScreen(
                             modifier = modifier
                                 .size(30.dp)
                                 .clickable { isActive = !isActive },
-                            painter = painterResource(R.drawable.baseline_filter_alt_24),
+                            painter = painterResource(R.drawable.ic_filter_image),
                             contentDescription = null,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -146,14 +146,14 @@ fun CharactersScreen(
                             Image(
                                 modifier = modifier
                                     .size(15.dp),
-                                painter = painterResource(R.drawable.baseline_arrow_drop_down_24),
+                                painter = painterResource(R.drawable.ic_arrow_drop_down),
                                 contentDescription = null,
                             )
                         } else {
                             Image(
                                 modifier = modifier
                                     .size(15.dp),
-                                painter = painterResource(R.drawable.baseline_arrow_drop_up_24),
+                                painter = painterResource(R.drawable.ic_arrow_drop_up),
                                 contentDescription = null,
                             )
                         }

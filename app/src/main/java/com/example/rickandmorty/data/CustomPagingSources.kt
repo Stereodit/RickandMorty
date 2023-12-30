@@ -8,20 +8,14 @@ import com.example.rickandmorty.data.models.Location
 import com.example.rickandmorty.data.remote.RickAndMortyApiService
 import retrofit2.HttpException
 
-class CharactersFilteredPagingSource(
-    private val apiSource: RickAndMortyApiService,
-    private val searchByName: String,
-    private val searchByStatus: String,
-    private val searchBySpecies: String,
-    private val searchByGender: String,
+class CharactersPagingSource(
+    private val apiSource: RickAndMortyApiService
 ) : PagingSource<Int, Character>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
         return try {
             val pageIndex = params.key ?: 1
-            val response = apiSource.getFilteredCharactersByPage(pageIndex, searchByName, searchByStatus, searchBySpecies, searchByGender)
-
-//            delay(2_000)
+            val response = apiSource.getCharactersByPage(pageIndex)
 
             return LoadResult.Page(
                 data = response.results,
@@ -39,6 +33,38 @@ class CharactersFilteredPagingSource(
 
     override fun getRefreshKey(state: PagingState<Int, Character>): Int?  = 1
 }
+
+//class CharactersFilteredPagingSource(
+//    private val apiSource: RickAndMortyApiService,
+//    private val searchByName: String,
+//    private val searchByStatus: String,
+//    private val searchBySpecies: String,
+//    private val searchByGender: String,
+//) : PagingSource<Int, Character>() {
+//
+//    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
+//        return try {
+//            val pageIndex = params.key ?: 1
+//            val response = apiSource.getFilteredCharactersByPage(pageIndex, searchByName, searchByStatus, searchBySpecies, searchByGender)
+//
+////            delay(2_000)
+//
+//            return LoadResult.Page(
+//                data = response.results,
+//                prevKey = if (response.info.prev == null) null else pageIndex - 1,
+//                nextKey = if (response.info.next == null) null else pageIndex + 1,
+//            )
+//        } catch (e: HttpException) {
+//            if (e.code() == 404)
+//                LoadResult.Page(emptyList(), null, null)
+//            else LoadResult.Error(throwable = e)
+//        } catch (e: Exception) {
+//            LoadResult.Error(throwable = e)
+//        }
+//    }
+//
+//    override fun getRefreshKey(state: PagingState<Int, Character>): Int?  = 1
+//}
 
 class EpisodesPagingSource(
     private val apiSource: RickAndMortyApiService,

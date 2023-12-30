@@ -6,6 +6,18 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
+@Entity(tableName = "remote_keys")
+data class RemoteKeys(
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "character_id")
+    val characterId: Int,
+    val prevKey: Int?,
+    val currentPage: Int,
+    val nextKey: Int?,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long = System.currentTimeMillis()
+)
+
 data class FullInfoCharacter(
     @Embedded val characterEntity: CharacterEntity,
     @Relation(
@@ -22,19 +34,7 @@ data class FullInfoCharacter(
         parentColumn = "id",
         entityColumn = "character_owner_id"
     )
-    val episodes: List<CharacterEpisodeEntity>
-)
-
-@Entity(tableName = "remote_key")
-data class RemoteKeys(
-    @PrimaryKey(autoGenerate = false)
-    @ColumnInfo(name = "character_id")
-    val characterId: Int,
-    val prevKey: Int?,
-    val currentPage: Int,
-    val nextKey: Int?,
-    @ColumnInfo(name = "created_at")
-    val createdAt: Long = System.currentTimeMillis()
+    val episode: List<CharacterEpisodeEntity>
 )
 
 @Entity(tableName = "characters")
@@ -48,10 +48,11 @@ data class CharacterEntity(
     val species: String,
     val status: String,
     val type: String,
-    val url: String
+    val url: String,
+    var page: Int
 )
 
-@Entity(tableName = "characters_location")
+@Entity(tableName = "character_location")
 data class CharacterLocationEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "character_location_id")
@@ -62,7 +63,7 @@ data class CharacterLocationEntity(
     val url: String
 )
 
-@Entity(tableName = "characters_origin")
+@Entity(tableName = "character_origin")
 data class CharacterOriginEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "character_origin_id")

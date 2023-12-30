@@ -4,13 +4,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CharactersSet(
-    val info: CharactersInfo,
+data class CharactersResponse(
+    val info: ResponsePageInfo,
     val results: List<Character>
 )
 
 @Serializable
-data class CharactersInfo(
+data class ResponsePageInfo(
     val count: Int,
     val next: String?,
     val pages: Int,
@@ -20,14 +20,13 @@ data class CharactersInfo(
 @Serializable
 data class Character(
     val created: String,
-    @SerialName(value = "episode")
-    val episodes: List<String>,
+    val episode: List<String>,
     val gender: String,
     val id: Int,
     val image: String,
     val location: CharacterLocation,
     val name: String,
-    val origin: Origin,
+    val origin: CharacterOrigin,
     val species: String,
     val status: String,
     val type: String,
@@ -41,7 +40,7 @@ data class CharacterLocation(
 )
 
 @Serializable
-data class Origin(
+data class CharacterOrigin(
     val name: String,
     val url: String
 )
