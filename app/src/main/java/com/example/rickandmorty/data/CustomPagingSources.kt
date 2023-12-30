@@ -3,8 +3,8 @@ package com.example.rickandmorty.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.rickandmorty.data.remote.Character
-import com.example.rickandmorty.data.models.Episode
-import com.example.rickandmorty.data.models.Location
+import com.example.rickandmorty.data.remote.Episode
+import com.example.rickandmorty.data.remote.Location
 import com.example.rickandmorty.data.remote.RickAndMortyApiService
 import retrofit2.HttpException
 

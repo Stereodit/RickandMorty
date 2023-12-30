@@ -6,12 +6,30 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [CharacterEntity::class, CharacterLocationEntity::class, CharacterOriginEntity::class, CharacterEpisodeEntity::class, RemoteKeys::class],
-    version = 2
+    entities = [
+        CharacterEntity::class,
+        CharacterLocationEntity::class,
+        CharacterOriginEntity::class,
+        CharacterEpisodeEntity::class,
+        CharacterRemoteKeys::class,
+        EpisodeEntity::class,
+        EpisodeCharacterEntity::class,
+        EpisodeRemoteKeys::class,
+        LocationEntity::class,
+        LocationCharacterEntity::class,
+        LocationRemoteKeys::class
+    ],
+    version = 7
 )
 abstract class RickAndMortyDatabase: RoomDatabase() {
     abstract val getCharactersDao: CharactersDao
-    abstract val getRemoteKeysDao: RemoteKeysDao
+    abstract val getCharactersRemoteKeysDao: CharactersRemoteKeysDao
+
+    abstract val getEpisodesDao: EpisodesDao
+    abstract val getEpisodesRemoteKeysDao: EpisodesRemoteKeysDao
+
+    abstract val getLocationsDao: LocationsDao
+    abstract val getLocationsRemoteKeysDao: LocationsRemoteKeysDao
 
     companion object {
 

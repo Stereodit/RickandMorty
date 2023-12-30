@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CharactersViewModel(
@@ -34,20 +33,14 @@ class CharactersViewModel(
         charactersFlow = searchByName.asStateFlow()
             .debounce(500)
             .flatMapLatest {
-                rickAndMortyRepository.getPagedCharacters(it, filterStatus, filterSpecies, filterGender)
+                rickAndMortyRepository.getPagedCharacters(it.trim(), filterStatus, filterSpecies, filterGender)
             }
             .cachedIn(viewModelScope)
     }
 
-    fun refreshDb() {
-        viewModelScope.launch {
-            rickAndMortyRepository.refreshCharacters()
-        }
-    }
-
     fun setSearchByName(value: String) {
         if (this.searchByName.value == value) return
-        this.searchByName.value = value
+        this.searchByName.value = value.trim()
     }
 
     companion object {

@@ -64,8 +64,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.rickandmorty.R
 import com.example.rickandmorty.data.mock.MockData
-import com.example.rickandmorty.data.remote.Character
 import com.example.rickandmorty.data.models.Filters
+import com.example.rickandmorty.data.remote.Character
 import com.example.rickandmorty.ui.core.ErrorLazyGrid
 import com.example.rickandmorty.ui.core.ErrorScreen
 import com.example.rickandmorty.ui.core.LoadingLazyGrid
@@ -81,17 +81,12 @@ fun CharactersScreen(
     lazyListState: LazyGridState = rememberLazyGridState(),
     charactersViewModel: CharactersViewModel = viewModel(factory = CharactersViewModel.Factory)
 ) {
-    val characters = charactersViewModel.charactersFlow.collectAsLazyPagingItems()
-    var searchText by remember {
-        mutableStateOf(charactersViewModel.searchByName.value)
-    }
-    var isActive by remember {
-        mutableStateOf(false)
-    }
-
+    var searchText by remember { mutableStateOf(charactersViewModel.searchByName.value) }
+    var isActive by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(false) }
-    val selectedFilters by remember { mutableStateOf(Filters.SelectedCharacterFilters("", "", "")) }
 
+    val characters = charactersViewModel.charactersFlow.collectAsLazyPagingItems()
+    val selectedFilters by remember { mutableStateOf(Filters.SelectedCharacterFilters("", "", "")) }
     val focusManager = LocalFocusManager.current
     val pullRefreshState = rememberPullRefreshState(
         refreshing = characters.loadState.refresh is LoadState.Loading,
@@ -172,7 +167,6 @@ fun CharactersScreen(
                                     charactersViewModel.filterSpecies = selectedFilters.species
                                     charactersViewModel.filterGender = selectedFilters.gender
                                     charactersViewModel.searchByName.value += " "
-                                    charactersViewModel.searchByName.value.trimEnd()
                                 } else {
                                     charactersViewModel.filterStatus = ""
                                     charactersViewModel.filterSpecies = ""
@@ -181,7 +175,6 @@ fun CharactersScreen(
                                     selectedFilters.species = ""
                                     selectedFilters.gender = ""
                                     charactersViewModel.searchByName.value += " "
-                                    charactersViewModel.searchByName.value.trimEnd()
                                     isActive = false
                                 }
                             },
@@ -200,7 +193,6 @@ fun CharactersScreen(
                             if (checked) {
                                 charactersViewModel.filterStatus = selectedFilters.status
                                 charactersViewModel.searchByName.value += " "
-                                charactersViewModel.searchByName.value.trimEnd()
                             }
                         },
                         selectSpecies = {
@@ -210,7 +202,6 @@ fun CharactersScreen(
                             if (checked) {
                                 charactersViewModel.filterSpecies = selectedFilters.species
                                 charactersViewModel.searchByName.value += " "
-                                charactersViewModel.searchByName.value.trimEnd()
                             }
                         },
                         selectGender = {
@@ -220,7 +211,6 @@ fun CharactersScreen(
                             if (checked) {
                                 charactersViewModel.filterGender = selectedFilters.gender
                                 charactersViewModel.searchByName.value += " "
-                                charactersViewModel.searchByName.value.trimEnd()
                             }
                         }
                     )

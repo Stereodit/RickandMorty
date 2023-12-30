@@ -18,10 +18,19 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,62 +41,98 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.rickandmorty.data.mock.MockData
-import com.example.rickandmorty.data.models.Location
+import com.example.rickandmorty.data.remote.Location
 import com.example.rickandmorty.ui.core.ErrorLazyGrid
 import com.example.rickandmorty.ui.core.ErrorScreen
 import com.example.rickandmorty.ui.core.LoadingLazyGrid
 import com.example.rickandmorty.ui.core.LoadingScreen
+import com.example.rickandmorty.ui.core.NotFoundScreen
 import com.example.rickandmorty.ui.core.viewmodels.LocationsViewModel
 import com.example.rickandmorty.ui.theme.RickAndMortyTheme
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LocationsScreen(
     modifier: Modifier = Modifier,
     lazyListState: LazyGridState = rememberLazyGridState(),
     locationsViewModel: LocationsViewModel = viewModel(factory = LocationsViewModel.Factory)
 ) {
+    var searchText by remember { mutableStateOf(locationsViewModel.searchByName.value) }
+
     val locations = locationsViewModel.locationsFlow.collectAsLazyPagingItems()
+    val focusManager = LocalFocusManager.current
     val pullRefreshState = rememberPullRefreshState(
         refreshing = locations.loadState.refresh is LoadState.Loading,
         onRefresh = { locations.refresh() }
     )
 
-    if (locations.loadState.refresh is LoadState.Error) {
-        ErrorScreen( retryAction = { locations.refresh() } )
-    } else {
-        when (locations.loadState.prepend) {
-            is LoadState.Loading -> {
-                LoadingScreen()
-            }
-            is LoadState.Error -> {
-                ErrorScreen(retryAction = { locations.retry() })
-            }
-            is LoadState.NotLoading -> {
-                Box {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .pullRefresh(pullRefreshState),
-                        contentPadding = PaddingValues(4.dp),
-                        state = lazyListState
-                    ) {
-                        items(locations.itemCount) {
-                            if (locations[it] != null)
-                                LocationCard(location = locations[it]!!)
-                        }
-                        item(span = { GridItemSpan(maxLineSpan) } ) {
-                            if (locations.loadState.append is LoadState.Loading) LoadingLazyGrid()
-                            if (locations.loadState.append is LoadState.Error) ErrorLazyGrid(retryAction = { locations.retry() })
+    Scaffold(
+        modifier = Modifier,
+        topBar = {
+            SearchBar(
+                query = searchText,
+                onQueryChange = { text ->
+                    searchText = text
+                    locationsViewModel.setSearchByName(searchText)
+                },
+                onSearch = {
+                    focusManager.clearFocus()
+                },
+                active = false,
+                onActiveChange = {},
+                placeholder = { Text(text = "Search...") },
+                shape = SearchBarDefaults.inputFieldShape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+            ) {}
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            if (locations.loadState.refresh is LoadState.Error) {
+                ErrorScreen(retryAction = { locations.refresh() })
+            } else {
+                when (locations.loadState.prepend) {
+                    is LoadState.Loading -> {
+                        LoadingScreen()
+                    }
+
+                    is LoadState.Error -> {
+                        ErrorScreen(retryAction = { locations.retry() })
+                    }
+
+                    is LoadState.NotLoading -> {
+                        Box {
+                            if (locations.itemCount == 0 && locations.loadState.refresh !is LoadState.Loading) {
+                                NotFoundScreen()
+                            } else {
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(2),
+                                    modifier = modifier
+                                        .fillMaxWidth()
+                                        .pullRefresh(pullRefreshState),
+                                    contentPadding = PaddingValues(4.dp),
+                                    state = lazyListState
+                                ) {
+                                    items(locations.itemCount) {
+                                        if (locations[it] != null)
+                                            LocationCard(location = locations[it]!!)
+                                    }
+                                    item(span = { GridItemSpan(maxLineSpan) }) {
+                                        if (locations.loadState.append is LoadState.Loading) LoadingLazyGrid()
+                                        if (locations.loadState.append is LoadState.Error) ErrorLazyGrid(
+                                            retryAction = { locations.retry() })
+                                    }
+                                }
+                                PullRefreshIndicator(
+                                    refreshing = locations.loadState.refresh is LoadState.Loading,
+                                    state = pullRefreshState,
+                                    modifier = Modifier.align(Alignment.TopCenter)
+                                )
+                            }
                         }
                     }
-                    PullRefreshIndicator(
-                        refreshing = locations.loadState.refresh is LoadState.Loading,
-                        state = pullRefreshState,
-                        modifier = Modifier.align(Alignment.TopCenter)
-                    )
                 }
             }
         }

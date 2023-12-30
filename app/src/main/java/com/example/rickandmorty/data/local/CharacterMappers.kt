@@ -49,7 +49,7 @@ fun FullInfoCharacter.toCharacterDto(): Character {
             url = origin.url
         ),
         species = characterEntity.species,
-        status = characterEntity.species,
+        status = characterEntity.status,
         type = characterEntity.type,
         url = characterEntity.url
     )

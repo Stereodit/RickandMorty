@@ -1,7 +1,5 @@
 package com.example.rickandmorty.data.remote
 
-import com.example.rickandmorty.data.models.EpisodesSet
-import com.example.rickandmorty.data.models.LocationsSet
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -11,24 +9,13 @@ interface RickAndMortyApiService {
         @Query("page") page: Int
     ): CharactersResponse
 
-//    @GET("character/")
-//    suspend fun getFilteredCharactersByPage(
-//        @Query("page") page: Int,
-//        @Query("name") name: String,
-//        @Query("status") status: String,
-//        @Query("species") species: String,
-//        @Query("gender") gender: String,
-//    ): CharactersSet
-
     @GET("episode/")
     suspend fun getEpisodesByPage(
-        @Query("page") page: Int,
-//        @Query("name") name: String,
-    ): EpisodesSet
+        @Query("page") page: Int
+    ): EpisodesResponse
 
     @GET("location/")
     suspend fun getLocationsByPage(
-        @Query("page") page: Int,
-//        @Query("name") name: String,
-    ): LocationsSet
+        @Query("page") page: Int
+    ): LocationsResponse
 }

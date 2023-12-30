@@ -6,8 +6,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
-@Entity(tableName = "remote_keys")
-data class RemoteKeys(
+@Entity(tableName = "character_remote_keys")
+data class CharacterRemoteKeys(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "character_id")
     val characterId: Int,

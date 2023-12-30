@@ -1,7 +1,7 @@
 package com.example.rickandmorty.data.mock
 
-import com.example.rickandmorty.data.models.Episode
-import com.example.rickandmorty.data.models.Location
+import com.example.rickandmorty.data.remote.Episode
+import com.example.rickandmorty.data.remote.Location
 import com.example.rickandmorty.data.remote.Character
 import com.example.rickandmorty.data.remote.CharacterLocation
 import com.example.rickandmorty.data.remote.CharacterOrigin

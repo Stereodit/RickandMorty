@@ -1,15 +1,15 @@
-package com.example.rickandmorty.data.models
+package com.example.rickandmorty.data.remote
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LocationsSet(
-    val info: LocationsInfo,
+data class LocationsResponse(
+    val info: LocationsPageInfo,
     val results: List<Location>
 )
 
 @Serializable
-data class LocationsInfo(
+data class LocationsPageInfo(
     val count: Int,
     val next: String?,
     val pages: Int,

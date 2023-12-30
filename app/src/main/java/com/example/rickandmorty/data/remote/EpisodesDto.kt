@@ -1,16 +1,16 @@
-package com.example.rickandmorty.data.models
+package com.example.rickandmorty.data.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class EpisodesSet(
-    val info: EpisodesInfo,
+data class EpisodesResponse(
+    val info: EpisodesPageInfo,
     val results: List<Episode>
 )
 
 @Serializable
-data class EpisodesInfo(
+data class EpisodesPageInfo(
     val count: Int,
     val next: String?,
     val pages: Int,

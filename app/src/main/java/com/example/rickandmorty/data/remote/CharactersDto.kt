@@ -1,16 +1,15 @@
 package com.example.rickandmorty.data.remote
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CharactersResponse(
-    val info: ResponsePageInfo,
+    val info: CharactersPageInfo,
     val results: List<Character>
 )
 
 @Serializable
-data class ResponsePageInfo(
+data class CharactersPageInfo(
     val count: Int,
     val next: String?,
     val pages: Int,
