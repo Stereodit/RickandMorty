@@ -1,10 +1,10 @@
 package com.example.rickandmorty.data.mock
 
-import com.example.rickandmorty.data.remote.Episode
-import com.example.rickandmorty.data.remote.Location
-import com.example.rickandmorty.data.remote.Character
-import com.example.rickandmorty.data.remote.CharacterLocation
-import com.example.rickandmorty.data.remote.CharacterOrigin
+import com.example.rickandmorty.data.remote.models.Episode
+import com.example.rickandmorty.data.remote.models.Location
+import com.example.rickandmorty.data.remote.models.Character
+import com.example.rickandmorty.data.remote.models.CharacterLocation
+import com.example.rickandmorty.data.remote.models.CharacterOrigin
 
 object MockData {
     val mockCharacter = Character(

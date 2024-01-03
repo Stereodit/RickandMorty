@@ -6,15 +6,15 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.example.rickandmorty.data.local.RickAndMortyDatabase
-import com.example.rickandmorty.data.remote.Character
-import com.example.rickandmorty.data.remote.CharacterLocation
-import com.example.rickandmorty.data.remote.CharacterOrigin
-import com.example.rickandmorty.data.remote.CharactersRemoteMediator
-import com.example.rickandmorty.data.remote.Episode
-import com.example.rickandmorty.data.remote.EpisodesRemoteMediator
-import com.example.rickandmorty.data.remote.Location
-import com.example.rickandmorty.data.remote.LocationsRemoteMediator
 import com.example.rickandmorty.data.remote.RickAndMortyApiService
+import com.example.rickandmorty.data.remote.mediators.CharactersRemoteMediator
+import com.example.rickandmorty.data.remote.mediators.EpisodesRemoteMediator
+import com.example.rickandmorty.data.remote.mediators.LocationsRemoteMediator
+import com.example.rickandmorty.data.remote.models.Character
+import com.example.rickandmorty.data.remote.models.CharacterLocation
+import com.example.rickandmorty.data.remote.models.CharacterOrigin
+import com.example.rickandmorty.data.remote.models.Episode
+import com.example.rickandmorty.data.remote.models.Location
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -22,8 +22,21 @@ const val PAGE_SIZE = 20
 
 interface RickAndMortyRepository {
     fun getPagedCharacters(searchString: String, status: String, species: String, gender: String): Flow<PagingData<Character>>
+
+    suspend fun getSelectedCharacter(id: Int): Character
+    suspend fun getEpisodesOfSelectedCharacter(query: String): List<Episode>
+    suspend fun getEpisodeOfSelectedCharacter(query: String): Episode
     fun getPagedEpisodes(searchString: String): Flow<PagingData<Episode>>
+    suspend fun getSelectedEpisode(id: Int): Episode
+
+    suspend fun getCharactersOfSelectedEpisode(query: String): List<Character>
+    suspend fun getCharacterOfSelectedEpisode(query: String): Character
     fun getPagedLocations(searchString: String): Flow<PagingData<Location>>
+
+    suspend fun getSelectedLocation(id: Int): Location
+
+    suspend fun getCharactersOfSelectedLocation(query: String): List<Character>
+    suspend fun getCharacterOfSelectedLocation(query: String): Character
 }
 
 class NetworkRickAndMortyRepository(
@@ -77,6 +90,10 @@ class NetworkRickAndMortyRepository(
         }
     }
 
+    override suspend fun getSelectedCharacter(id: Int): Character = rickAndMortyApiService.getSelectedCharacter(id)
+    override suspend fun getEpisodesOfSelectedCharacter(query: String): List<Episode> = rickAndMortyApiService.getEpisodesOfSelectedCharacter(query)
+    override suspend fun getEpisodeOfSelectedCharacter(query: String): Episode = rickAndMortyApiService.getEpisodeOfSelectedCharacter(query)
+
     @OptIn(ExperimentalPagingApi::class)
     override fun getPagedEpisodes(searchString: String): Flow<PagingData<Episode>> {
         return Pager(
@@ -109,6 +126,10 @@ class NetworkRickAndMortyRepository(
         }
     }
 
+    override suspend fun getSelectedEpisode(id: Int): Episode = rickAndMortyApiService.getSelectedEpisode(id)
+    override suspend fun getCharactersOfSelectedEpisode(query: String): List<Character> = rickAndMortyApiService.getCharactersOfSelectedEpisode(query)
+    override suspend fun getCharacterOfSelectedEpisode(query: String): Character = rickAndMortyApiService.getCharacterOfSelectedEpisode(query)
+
     @OptIn(ExperimentalPagingApi::class)
     override fun getPagedLocations(searchString: String): Flow<PagingData<Location>> {
         return Pager(
@@ -140,6 +161,10 @@ class NetworkRickAndMortyRepository(
             }
         }
     }
+
+    override suspend fun getSelectedLocation(id: Int): Location = rickAndMortyApiService.getSelectedLocation(id)
+    override suspend fun getCharactersOfSelectedLocation(query: String): List<Character> = rickAndMortyApiService.getCharactersOfSelectedLocation(query)
+    override suspend fun getCharacterOfSelectedLocation(query: String): Character = rickAndMortyApiService.getCharacterOfSelectedLocation(query)
 }
 
 

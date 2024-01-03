@@ -1,8 +1,13 @@
-package com.example.rickandmorty.data.local
+package com.example.rickandmorty.data.local.mappers
 
-import com.example.rickandmorty.data.remote.Character
-import com.example.rickandmorty.data.remote.CharacterLocation
-import com.example.rickandmorty.data.remote.CharacterOrigin
+import com.example.rickandmorty.data.local.models.CharacterEntity
+import com.example.rickandmorty.data.local.models.CharacterEpisodeEntity
+import com.example.rickandmorty.data.local.models.CharacterLocationEntity
+import com.example.rickandmorty.data.local.models.CharacterOriginEntity
+import com.example.rickandmorty.data.local.models.FullInfoCharacter
+import com.example.rickandmorty.data.remote.models.Character
+import com.example.rickandmorty.data.remote.models.CharacterLocation
+import com.example.rickandmorty.data.remote.models.CharacterOrigin
 
 fun Character.toFullInfoCharacter(page: Int): FullInfoCharacter {
     return FullInfoCharacter(

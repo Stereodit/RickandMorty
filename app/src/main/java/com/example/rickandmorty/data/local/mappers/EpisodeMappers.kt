@@ -1,6 +1,9 @@
-package com.example.rickandmorty.data.local
+package com.example.rickandmorty.data.local.mappers
 
-import com.example.rickandmorty.data.remote.Episode
+import com.example.rickandmorty.data.local.models.EpisodeCharacterEntity
+import com.example.rickandmorty.data.local.models.EpisodeEntity
+import com.example.rickandmorty.data.local.models.FullInfoEpisode
+import com.example.rickandmorty.data.remote.models.Episode
 
 fun Episode.toFullInfoEpisode(page: Int): FullInfoEpisode {
     return FullInfoEpisode(

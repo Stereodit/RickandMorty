@@ -9,7 +9,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.rickandmorty.RickAndMortyApplication
 import com.example.rickandmorty.data.RickAndMortyRepository
-import com.example.rickandmorty.data.remote.Location
+import com.example.rickandmorty.data.remote.models.Location
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

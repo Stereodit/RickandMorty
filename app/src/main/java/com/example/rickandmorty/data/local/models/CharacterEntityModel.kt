@@ -1,4 +1,4 @@
-package com.example.rickandmorty.data.local
+package com.example.rickandmorty.data.local.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

@@ -1,15 +1,16 @@
-package com.example.rickandmorty.data.remote
+package com.example.rickandmorty.data.remote.mediators
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.example.rickandmorty.data.local.CharacterEntity
-import com.example.rickandmorty.data.local.CharacterRemoteKeys
+import com.example.rickandmorty.data.local.models.CharacterEntity
+import com.example.rickandmorty.data.local.models.CharacterRemoteKeys
 import com.example.rickandmorty.data.local.RickAndMortyDatabase
-import com.example.rickandmorty.data.local.toEntityEpisode
-import com.example.rickandmorty.data.local.toFullInfoCharacter
+import com.example.rickandmorty.data.local.mappers.toEntityEpisode
+import com.example.rickandmorty.data.local.mappers.toFullInfoCharacter
+import com.example.rickandmorty.data.remote.RickAndMortyApiService
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.concurrent.TimeUnit

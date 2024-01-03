@@ -6,6 +6,17 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
+import com.example.rickandmorty.data.local.models.CharacterEntity
+import com.example.rickandmorty.data.local.models.CharacterEpisodeEntity
+import com.example.rickandmorty.data.local.models.CharacterLocationEntity
+import com.example.rickandmorty.data.local.models.CharacterOriginEntity
+import com.example.rickandmorty.data.local.models.CharacterRemoteKeys
+import com.example.rickandmorty.data.local.models.EpisodeCharacterEntity
+import com.example.rickandmorty.data.local.models.EpisodeEntity
+import com.example.rickandmorty.data.local.models.EpisodeRemoteKeys
+import com.example.rickandmorty.data.local.models.LocationCharacterEntity
+import com.example.rickandmorty.data.local.models.LocationEntity
+import com.example.rickandmorty.data.local.models.LocationRemoteKeys
 
 @Dao
 interface CharactersDao {

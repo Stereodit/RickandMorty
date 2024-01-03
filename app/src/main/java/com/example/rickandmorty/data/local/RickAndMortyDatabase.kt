@@ -4,6 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.rickandmorty.data.local.models.CharacterEntity
+import com.example.rickandmorty.data.local.models.CharacterEpisodeEntity
+import com.example.rickandmorty.data.local.models.CharacterLocationEntity
+import com.example.rickandmorty.data.local.models.CharacterOriginEntity
+import com.example.rickandmorty.data.local.models.CharacterRemoteKeys
+import com.example.rickandmorty.data.local.models.EpisodeCharacterEntity
+import com.example.rickandmorty.data.local.models.EpisodeEntity
+import com.example.rickandmorty.data.local.models.EpisodeRemoteKeys
+import com.example.rickandmorty.data.local.models.LocationCharacterEntity
+import com.example.rickandmorty.data.local.models.LocationEntity
+import com.example.rickandmorty.data.local.models.LocationRemoteKeys
 
 @Database(
     entities = [

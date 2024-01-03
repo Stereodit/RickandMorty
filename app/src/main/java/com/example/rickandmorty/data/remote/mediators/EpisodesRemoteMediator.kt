@@ -1,29 +1,30 @@
-package com.example.rickandmorty.data.remote
+package com.example.rickandmorty.data.remote.mediators
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.example.rickandmorty.data.local.LocationEntity
-import com.example.rickandmorty.data.local.LocationRemoteKeys
+import com.example.rickandmorty.data.local.models.EpisodeEntity
+import com.example.rickandmorty.data.local.models.EpisodeRemoteKeys
 import com.example.rickandmorty.data.local.RickAndMortyDatabase
-import com.example.rickandmorty.data.local.toFullInfoLocation
-import com.example.rickandmorty.data.local.toLocationCharactersEntity
+import com.example.rickandmorty.data.local.mappers.toEpisodeCharactersEntity
+import com.example.rickandmorty.data.local.mappers.toFullInfoEpisode
+import com.example.rickandmorty.data.remote.RickAndMortyApiService
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalPagingApi::class)
-class LocationsRemoteMediator(
+class EpisodesRemoteMediator(
     private val rickAndMortyDatabase: RickAndMortyDatabase,
     private val rickAndMortyApiService: RickAndMortyApiService
-): RemoteMediator<Int, LocationEntity>() {
+): RemoteMediator<Int, EpisodeEntity>() {
 
     override suspend fun initialize(): InitializeAction {
         val cacheTimeout = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
 
-        return if (System.currentTimeMillis() - (rickAndMortyDatabase.getLocationsRemoteKeysDao.getCreationTime() ?: 0) < cacheTimeout) {
+        return if (System.currentTimeMillis() - (rickAndMortyDatabase.getEpisodesRemoteKeysDao.getCreationTime() ?: 0) < cacheTimeout) {
             InitializeAction.SKIP_INITIAL_REFRESH
         } else {
             InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -32,7 +33,7 @@ class LocationsRemoteMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, LocationEntity>
+        state: PagingState<Int, EpisodeEntity>
     ): MediatorResult {
         val page: Int = when(loadType) {
             LoadType.REFRESH -> {
@@ -52,26 +53,26 @@ class LocationsRemoteMediator(
         }
 
         try {
-            val apiResponse = rickAndMortyApiService.getLocationsByPage(page = page)
-            val locations = apiResponse.results
-            val endOfPaginationReached = locations.isEmpty()
+            val apiResponse = rickAndMortyApiService.getEpisodesByPage(page = page)
+            val episodes = apiResponse.results
+            val endOfPaginationReached = episodes.isEmpty()
 
             rickAndMortyDatabase.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    rickAndMortyDatabase.getLocationsRemoteKeysDao.clearRemoteKeys()
-                    rickAndMortyDatabase.getLocationsDao.clearLocations()
-                    rickAndMortyDatabase.getLocationsDao.clearLocationCharacters()
+                    rickAndMortyDatabase.getEpisodesRemoteKeysDao.clearRemoteKeys()
+                    rickAndMortyDatabase.getEpisodesDao.clearEpisodes()
+                    rickAndMortyDatabase.getEpisodesDao.clearEpisodeCharacters()
                 }
                 val prevKey = if (apiResponse.info.prev == null) null else page - 1
                 val nextKey = if (apiResponse.info.next == null) null else page + 1
-                val locationRemoteKeys = locations.map {
-                    LocationRemoteKeys(locationId = it.id, prevKey = prevKey, currentPage = page, nextKey = nextKey)
+                val episodeRemoteKeys = episodes.map {
+                    EpisodeRemoteKeys(episodeId = it.id, prevKey = prevKey, currentPage = page, nextKey = nextKey)
                 }
 
-                rickAndMortyDatabase.getLocationsRemoteKeysDao.insertAll(locationRemoteKeys)
-                rickAndMortyDatabase.getLocationsDao.upsertLocations(locations.map { it.toFullInfoLocation(page).locationEntity })
-                locations.forEach {
-                    rickAndMortyDatabase.getLocationsDao.upsertLocationCharacters(it.residents.toLocationCharactersEntity(it.id))
+                rickAndMortyDatabase.getEpisodesRemoteKeysDao.insertAll(episodeRemoteKeys)
+                rickAndMortyDatabase.getEpisodesDao.upsertEpisodes(episodes.map { it.toFullInfoEpisode(page).episodeEntity })
+                episodes.forEach {
+                    rickAndMortyDatabase.getEpisodesDao.upsertEpisodeCharacters(it.characters.toEpisodeCharactersEntity(it.id))
                 }
             }
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
@@ -82,27 +83,27 @@ class LocationsRemoteMediator(
         }
     }
 
-    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, LocationEntity>): LocationRemoteKeys? {
+    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, EpisodeEntity>): EpisodeRemoteKeys? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { id ->
-                rickAndMortyDatabase.getLocationsRemoteKeysDao.getRemoteKeyByLocationId(id)
+                rickAndMortyDatabase.getEpisodesRemoteKeysDao.getRemoteKeyByEpisodeId(id)
             }
         }
     }
 
-    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, LocationEntity>): LocationRemoteKeys? {
+    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, EpisodeEntity>): EpisodeRemoteKeys? {
         return state.pages.firstOrNull {
             it.data.isNotEmpty()
-        }?.data?.firstOrNull()?.let { location ->
-            rickAndMortyDatabase.getLocationsRemoteKeysDao.getRemoteKeyByLocationId(location.id)
+        }?.data?.firstOrNull()?.let { episode ->
+            rickAndMortyDatabase.getEpisodesRemoteKeysDao.getRemoteKeyByEpisodeId(episode.id)
         }
     }
 
-    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, LocationEntity>): LocationRemoteKeys? {
+    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, EpisodeEntity>): EpisodeRemoteKeys? {
         return state.pages.lastOrNull {
             it.data.isNotEmpty()
-        }?.data?.lastOrNull()?.let { location ->
-            rickAndMortyDatabase.getLocationsRemoteKeysDao.getRemoteKeyByLocationId(location.id)
+        }?.data?.lastOrNull()?.let { episode ->
+            rickAndMortyDatabase.getEpisodesRemoteKeysDao.getRemoteKeyByEpisodeId(episode.id)
         }
     }
 }

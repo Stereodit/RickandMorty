@@ -1,6 +1,9 @@
-package com.example.rickandmorty.data.local
+package com.example.rickandmorty.data.local.mappers
 
-import com.example.rickandmorty.data.remote.Location
+import com.example.rickandmorty.data.local.models.FullInfoLocation
+import com.example.rickandmorty.data.local.models.LocationCharacterEntity
+import com.example.rickandmorty.data.local.models.LocationEntity
+import com.example.rickandmorty.data.remote.models.Location
 
 fun Location.toFullInfoLocation(page: Int): FullInfoLocation {
     return FullInfoLocation(

@@ -65,7 +65,7 @@ import coil.request.ImageRequest
 import com.example.rickandmorty.R
 import com.example.rickandmorty.data.mock.MockData
 import com.example.rickandmorty.data.models.Filters
-import com.example.rickandmorty.data.remote.Character
+import com.example.rickandmorty.data.remote.models.Character
 import com.example.rickandmorty.ui.core.ErrorLazyGrid
 import com.example.rickandmorty.ui.core.ErrorScreen
 import com.example.rickandmorty.ui.core.LoadingLazyGrid
@@ -79,7 +79,8 @@ import com.example.rickandmorty.ui.theme.RickAndMortyTheme
 fun CharactersScreen(
     modifier: Modifier = Modifier,
     lazyListState: LazyGridState = rememberLazyGridState(),
-    charactersViewModel: CharactersViewModel = viewModel(factory = CharactersViewModel.Factory)
+    charactersViewModel: CharactersViewModel = viewModel(factory = CharactersViewModel.Factory),
+    onCharacterClick: (Int) -> Unit
 ) {
     var searchText by remember { mutableStateOf(charactersViewModel.searchByName.value) }
     var isActive by remember { mutableStateOf(false) }
@@ -244,7 +245,10 @@ fun CharactersScreen(
                                 ) {
                                     items(characters.itemCount) {
                                         if (characters[it] != null)
-                                            CharacterCard(character = characters[it]!!)
+                                            CharacterCard(
+                                                character = characters[it]!!,
+                                                onCharacterClick = onCharacterClick
+                                            )
                                     }
                                     item(span = { GridItemSpan(maxLineSpan) } ) {
                                         if (characters.loadState.append is LoadState.Loading) LoadingLazyGrid()
@@ -392,11 +396,13 @@ fun FiltersCard(
 @Composable
 fun CharacterCard(
     character: Character,
+    onCharacterClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card (
         modifier = Modifier
             .padding(4.dp)
+            .clickable { onCharacterClick(character.id) }
     ) {
         Column {
             AsyncImage(
@@ -464,6 +470,7 @@ fun PreviewCharacterCard() {
     RickAndMortyTheme {
         CharacterCard(
             character = MockData.mockCharacter,
+            {}
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.example.rickandmorty.data.remote
+package com.example.rickandmorty.data.remote.models
 
 import kotlinx.serialization.Serializable
 

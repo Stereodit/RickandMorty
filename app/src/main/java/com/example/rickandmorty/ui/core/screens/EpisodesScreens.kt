@@ -1,5 +1,6 @@
 package com.example.rickandmorty.ui.core.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.rickandmorty.data.mock.MockData
-import com.example.rickandmorty.data.remote.Episode
+import com.example.rickandmorty.data.remote.models.Episode
 import com.example.rickandmorty.ui.core.ErrorLazyGrid
 import com.example.rickandmorty.ui.core.ErrorScreen
 import com.example.rickandmorty.ui.core.LoadingLazyGrid
@@ -56,7 +57,8 @@ import com.example.rickandmorty.ui.theme.RickAndMortyTheme
 fun EpisodesScreen(
     modifier: Modifier = Modifier,
     lazyListState: LazyGridState = rememberLazyGridState(),
-    episodesViewModel: EpisodesViewModel = viewModel(factory = EpisodesViewModel.Factory)
+    episodesViewModel: EpisodesViewModel = viewModel(factory = EpisodesViewModel.Factory),
+    onEpisodeClick: (Int) -> Unit
 ) {
     var searchText by remember { mutableStateOf(episodesViewModel.searchByName.value) }
 
@@ -121,7 +123,10 @@ fun EpisodesScreen(
                                 ) {
                                     items(episodes.itemCount) {
                                         if (episodes[it] != null)
-                                            EpisodeCard(episode = episodes[it]!!)
+                                            EpisodeCard(
+                                                episode = episodes[it]!!,
+                                                onEpisodeClick = onEpisodeClick
+                                            )
                                     }
                                     item(span = { GridItemSpan(maxLineSpan) }) {
                                         if (episodes.loadState.append is LoadState.Loading) LoadingLazyGrid()
@@ -146,12 +151,14 @@ fun EpisodesScreen(
 @Composable
 fun EpisodeCard(
     episode: Episode,
+    onEpisodeClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .height(104.dp)
             .padding(4.dp)
+            .clickable { onEpisodeClick(episode.id) }
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
@@ -188,6 +195,7 @@ fun PreviewEpisodeCard() {
     RickAndMortyTheme {
         EpisodeCard(
             episode = MockData.mockEpisode,
+            {},
             modifier = Modifier.sizeIn(maxWidth = 250.dp)
         )
     }

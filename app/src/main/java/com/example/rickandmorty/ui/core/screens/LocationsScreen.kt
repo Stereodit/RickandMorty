@@ -1,5 +1,6 @@
 package com.example.rickandmorty.ui.core.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,7 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.rickandmorty.data.mock.MockData
-import com.example.rickandmorty.data.remote.Location
+import com.example.rickandmorty.data.remote.models.Location
 import com.example.rickandmorty.ui.core.ErrorLazyGrid
 import com.example.rickandmorty.ui.core.ErrorScreen
 import com.example.rickandmorty.ui.core.LoadingLazyGrid
@@ -56,7 +57,8 @@ import com.example.rickandmorty.ui.theme.RickAndMortyTheme
 fun LocationsScreen(
     modifier: Modifier = Modifier,
     lazyListState: LazyGridState = rememberLazyGridState(),
-    locationsViewModel: LocationsViewModel = viewModel(factory = LocationsViewModel.Factory)
+    locationsViewModel: LocationsViewModel = viewModel(factory = LocationsViewModel.Factory),
+    onLocationClick: (Int) -> Unit
 ) {
     var searchText by remember { mutableStateOf(locationsViewModel.searchByName.value) }
 
@@ -117,7 +119,10 @@ fun LocationsScreen(
                                 ) {
                                     items(locations.itemCount) {
                                         if (locations[it] != null)
-                                            LocationCard(location = locations[it]!!)
+                                            LocationCard(
+                                                location = locations[it]!!,
+                                                onLocationClick = onLocationClick
+                                            )
                                     }
                                     item(span = { GridItemSpan(maxLineSpan) }) {
                                         if (locations.loadState.append is LoadState.Loading) LoadingLazyGrid()
@@ -142,12 +147,14 @@ fun LocationsScreen(
 @Composable
 fun LocationCard(
     location: Location,
+    onLocationClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .height(150.dp)
             .padding(4.dp)
+            .clickable { onLocationClick(location.id) }
     ) {
         Column(
             modifier = Modifier
@@ -193,7 +200,8 @@ fun PreviewLocationCard() {
     RickAndMortyTheme {
         LocationCard(
             location = MockData.mockLocation,
-            modifier = Modifier.sizeIn(minWidth = 250.dp, maxWidth = 300.dp)
+            {},
+            modifier = Modifier.sizeIn(minWidth = 250.dp, maxWidth = 300.dp),
         )
     }
 }
