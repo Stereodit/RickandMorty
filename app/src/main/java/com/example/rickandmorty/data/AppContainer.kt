@@ -8,8 +8,12 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 
+const val PAGE_SIZE = 20
+
 interface AppContainer {
-    val rickAndMortyRepository: RickAndMortyRepository
+    val locationRepository: LocationRepository
+    val episodeRepository: EpisodeRepository
+    val characterRepository: CharacterRepository
 }
 
 class DefaultAppContainer(context: Context) : AppContainer {
@@ -24,7 +28,15 @@ class DefaultAppContainer(context: Context) : AppContainer {
         retrofit.create(RickAndMortyApiService::class.java)
     }
 
-    override val rickAndMortyRepository: RickAndMortyRepository by lazy {
-        NetworkRickAndMortyRepository(rickAndMortyDatabase = RickAndMortyDatabase.getInstance(context), rickAndMortyApiService = retrofitService)
+    override val locationRepository: LocationRepository by lazy {
+        LocationRepositoryImpl(rickAndMortyLocalDataSource = RickAndMortyDatabase.getInstance(context), rickAndMortyRemoteDataSource = retrofitService)
+    }
+
+    override val episodeRepository: EpisodeRepository by lazy {
+        EpisodeRepositoryImpl(rickAndMortyLocalDataSource = RickAndMortyDatabase.getInstance(context), rickAndMortyRemoteDataSource = retrofitService)
+    }
+
+    override val characterRepository: CharacterRepository by lazy {
+        CharacterRepositoryImpl(rickAndMortyLocalDataSource = RickAndMortyDatabase.getInstance(context), rickAndMortyRemoteDataSource = retrofitService)
     }
 }

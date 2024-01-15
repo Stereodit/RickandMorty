@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.rickandmorty.RickAndMortyApplication
-import com.example.rickandmorty.data.RickAndMortyRepository
+import com.example.rickandmorty.data.LocationRepository
 import com.example.rickandmorty.data.remote.models.Character
 import com.example.rickandmorty.data.remote.models.Location
 import kotlinx.coroutines.launch
@@ -30,7 +30,7 @@ sealed interface CharactersOfSelectedLocationUiState {
 }
 
 class LocationDetailsViewModel(
-    private val rickAndMortyRepository: RickAndMortyRepository
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
     var locationDetailsUiState: LocationDetailsUiState by mutableStateOf(LocationDetailsUiState.Loading)
         private set
@@ -41,7 +41,7 @@ class LocationDetailsViewModel(
         viewModelScope.launch {
             locationDetailsUiState = LocationDetailsUiState.Loading
             locationDetailsUiState = try {
-                LocationDetailsUiState.SuccessLoadLocation(rickAndMortyRepository.getSelectedLocation(locationId))
+                LocationDetailsUiState.SuccessLoadLocation(locationRepository.getSelectedLocation(locationId))
             } catch (e: IOException) {
                 LocationDetailsUiState.Error
             } catch (e: HttpException) {
@@ -62,9 +62,9 @@ class LocationDetailsViewModel(
                 charactersUiState = CharactersOfSelectedLocationUiState.Loading
                 charactersUiState = try {
                     if ((locationDetailsUiState as LocationDetailsUiState.SuccessLoadLocation).location.residents.size == 1) {
-                        CharactersOfSelectedLocationUiState.SuccessLoadCharacters(listOf(rickAndMortyRepository.getCharacterOfSelectedLocation(query)))
+                        CharactersOfSelectedLocationUiState.SuccessLoadCharacters(listOf(locationRepository.getCharacterOfSelectedLocation(query)))
                     } else {
-                        CharactersOfSelectedLocationUiState.SuccessLoadCharacters(rickAndMortyRepository.getCharactersOfSelectedLocation(query))
+                        CharactersOfSelectedLocationUiState.SuccessLoadCharacters(locationRepository.getCharactersOfSelectedLocation(query))
                     }
                 } catch (e: IOException) {
                     CharactersOfSelectedLocationUiState.Error
@@ -81,8 +81,8 @@ class LocationDetailsViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RickAndMortyApplication)
-                val rickAndMortyRepository = application.container.rickAndMortyRepository
-                LocationDetailsViewModel(rickAndMortyRepository = rickAndMortyRepository)
+                val locationRepository = application.container.locationRepository
+                LocationDetailsViewModel(locationRepository = locationRepository)
             }
         }
     }

@@ -8,16 +8,19 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.rickandmorty.RickAndMortyApplication
-import com.example.rickandmorty.data.RickAndMortyRepository
+import com.example.rickandmorty.data.LocationRepository
 import com.example.rickandmorty.data.remote.models.Location
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class LocationsViewModel(
-    private val rickAndMortyRepository: RickAndMortyRepository
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     val locationsFlow: Flow<PagingData<Location>>
@@ -27,7 +30,7 @@ class LocationsViewModel(
         locationsFlow = searchByName.asStateFlow()
             .debounce(500)
             .flatMapLatest {
-                rickAndMortyRepository.getPagedLocations(it.trim())
+                locationRepository.getPagedLocations(it.trim())
             }
             .cachedIn(viewModelScope)
     }
@@ -41,8 +44,8 @@ class LocationsViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RickAndMortyApplication)
-                val rickAndMortyRepository = application.container.rickAndMortyRepository
-                LocationsViewModel(rickAndMortyRepository = rickAndMortyRepository)
+                val locationRepository = application.container.locationRepository
+                LocationsViewModel(locationRepository = locationRepository)
             }
         }
     }

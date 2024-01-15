@@ -8,7 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.rickandmorty.RickAndMortyApplication
-import com.example.rickandmorty.data.RickAndMortyRepository
+import com.example.rickandmorty.data.CharacterRepository
 import com.example.rickandmorty.data.remote.models.Character
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CharactersViewModel(
-    private val rickAndMortyRepository: RickAndMortyRepository
+    private val characterRepository: CharacterRepository
 ) : ViewModel() {
 
     var charactersFlow: Flow<PagingData<Character>>
@@ -33,7 +33,7 @@ class CharactersViewModel(
         charactersFlow = searchByName.asStateFlow()
             .debounce(500)
             .flatMapLatest {
-                rickAndMortyRepository.getPagedCharacters(it.trim(), filterStatus, filterSpecies, filterGender)
+                characterRepository.getPagedCharacters(it.trim(), filterStatus, filterSpecies, filterGender)
             }
             .cachedIn(viewModelScope)
     }
@@ -47,8 +47,8 @@ class CharactersViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RickAndMortyApplication)
-                val rickAndMortyRepository = application.container.rickAndMortyRepository
-                CharactersViewModel(rickAndMortyRepository = rickAndMortyRepository)
+                val characterRepository = application.container.characterRepository
+                CharactersViewModel(characterRepository = characterRepository)
             }
         }
     }

@@ -8,16 +8,19 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.rickandmorty.RickAndMortyApplication
-import com.example.rickandmorty.data.RickAndMortyRepository
+import com.example.rickandmorty.data.EpisodeRepository
 import com.example.rickandmorty.data.remote.models.Episode
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class EpisodesViewModel(
-    private val rickAndMortyRepository: RickAndMortyRepository
+    private val episodeRepository: EpisodeRepository
 ) : ViewModel() {
 
     val episodesFlow: Flow<PagingData<Episode>>
@@ -27,7 +30,7 @@ class EpisodesViewModel(
         episodesFlow = searchByName.asStateFlow()
             .debounce(500)
             .flatMapLatest {
-                rickAndMortyRepository.getPagedEpisodes(it.trim())
+                episodeRepository.getPagedEpisodes(it.trim())
             }
             .cachedIn(viewModelScope)
     }
@@ -41,8 +44,8 @@ class EpisodesViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RickAndMortyApplication)
-                val rickAndMortyRepository = application.container.rickAndMortyRepository
-                EpisodesViewModel(rickAndMortyRepository = rickAndMortyRepository)
+                val episodeRepository = application.container.episodeRepository
+                EpisodesViewModel(episodeRepository = episodeRepository)
             }
         }
     }

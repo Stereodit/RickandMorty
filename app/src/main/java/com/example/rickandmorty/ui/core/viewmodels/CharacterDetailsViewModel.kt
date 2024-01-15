@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.rickandmorty.RickAndMortyApplication
-import com.example.rickandmorty.data.RickAndMortyRepository
+import com.example.rickandmorty.data.CharacterRepository
 import com.example.rickandmorty.data.remote.models.Character
 import com.example.rickandmorty.data.remote.models.Episode
 import kotlinx.coroutines.launch
@@ -30,7 +30,7 @@ sealed interface EpisodesOfSelectedCharacterUiState {
 }
 
 class CharacterDetailsViewModel(
-    private val rickAndMortyRepository: RickAndMortyRepository
+    private val characterRepository: CharacterRepository
 ) : ViewModel() {
     var characterDetailsUiState: CharacterDetailsUiState by mutableStateOf(CharacterDetailsUiState.Loading)
         private set
@@ -41,7 +41,7 @@ class CharacterDetailsViewModel(
         viewModelScope.launch {
             characterDetailsUiState = CharacterDetailsUiState.Loading
             characterDetailsUiState = try {
-                CharacterDetailsUiState.SuccessLoadCharacter(rickAndMortyRepository.getSelectedCharacter(characterId))
+                CharacterDetailsUiState.SuccessLoadCharacter(characterRepository.getSelectedCharacter(characterId))
             } catch (e: IOException) {
                 CharacterDetailsUiState.Error
             } catch (e: HttpException) {
@@ -62,9 +62,9 @@ class CharacterDetailsViewModel(
                 episodesUiState = EpisodesOfSelectedCharacterUiState.Loading
                 episodesUiState = try {
                     if ((characterDetailsUiState as CharacterDetailsUiState.SuccessLoadCharacter).character.episode.size == 1) {
-                        EpisodesOfSelectedCharacterUiState.SuccessLoadEpisodes(listOf(rickAndMortyRepository.getEpisodeOfSelectedCharacter(query)))
+                        EpisodesOfSelectedCharacterUiState.SuccessLoadEpisodes(listOf(characterRepository.getEpisodeOfSelectedCharacter(query)))
                     } else {
-                        EpisodesOfSelectedCharacterUiState.SuccessLoadEpisodes(rickAndMortyRepository.getEpisodesOfSelectedCharacter(query))
+                        EpisodesOfSelectedCharacterUiState.SuccessLoadEpisodes(characterRepository.getEpisodesOfSelectedCharacter(query))
                     }
                 } catch (e: IOException) {
                     EpisodesOfSelectedCharacterUiState.Error
@@ -81,8 +81,8 @@ class CharacterDetailsViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RickAndMortyApplication)
-                val rickAndMortyRepository = application.container.rickAndMortyRepository
-                CharacterDetailsViewModel(rickAndMortyRepository = rickAndMortyRepository)
+                val characterRepository = application.container.characterRepository
+                CharacterDetailsViewModel(characterRepository = characterRepository)
             }
         }
     }
