@@ -58,6 +58,8 @@ fun CharacterDetailsScreen(
     characterDetailsViewModel: CharacterDetailsViewModel = viewModel(factory = CharacterDetailsViewModel.Factory),
     selectedCharacterId: Int,
     onEpisodeClick: (Int) -> Unit,
+    onOriginClick: (Int) -> Unit,
+    onLocationClick: (Int) -> Unit,
     onBackButtonClick: () -> Unit,
     onCancelButtonClick: () -> Unit
 ) {
@@ -76,13 +78,14 @@ fun CharacterDetailsScreen(
     when(characterDetailsViewModel.characterDetailsUiState) {
         is CharacterDetailsUiState.Loading -> LoadingScreen()
         is CharacterDetailsUiState.SuccessLoadCharacter -> {
-            characterDetailsViewModel.getEpisodesOfSelectedCharacter()
                 CharacterDetailsScreenLayout(
                     character = (characterDetailsViewModel.characterDetailsUiState
                             as CharacterDetailsUiState.SuccessLoadCharacter).character,
                     episodesUiState = characterDetailsViewModel.episodesUiState,
                     retryAction = { characterDetailsViewModel.getEpisodesOfSelectedCharacter() },
                     onEpisodeClick = onEpisodeClick,
+                    onOriginClick = onOriginClick,
+                    onLocationClick = onLocationClick,
                     onBackButtonClick = onBackButtonClick
                 )
             }
@@ -100,6 +103,8 @@ fun CharacterDetailsScreenLayout(
     episodesUiState: EpisodesOfSelectedCharacterUiState,
     retryAction: () -> Unit,
     onEpisodeClick: (Int) -> Unit,
+    onOriginClick: (Int) -> Unit,
+    onLocationClick: (Int) -> Unit,
     onBackButtonClick: () -> Unit,
     character: Character
 ) {
@@ -159,21 +164,29 @@ fun CharacterDetailsScreenLayout(
                 Text(text = "Gender: " + character.gender)
                 Row {
                     Text(text = "Origin: ")
-                    Text(
-                        text = character.origin.name,
-                        color = MaterialTheme.colorScheme.inversePrimary,
-                        modifier = Modifier
-                            .clickable {  }
-                    ) //here must be hyper-url
+                    if(character.origin.name != "unknown") {
+                        Text(
+                            text = character.origin.name,
+                            color = MaterialTheme.colorScheme.inversePrimary,
+                            modifier = Modifier
+                                .clickable { onOriginClick(character.origin.url.removePrefix("https://rickandmortyapi.com/api/location/").toInt()) }
+                        )
+                    } else {
+                        Text(text = character.origin.name, color = MaterialTheme.colorScheme.inversePrimary)
+                    }
                 }
                 Row {
                     Text(text = "Location: ")
-                    Text(
-                        text = character.location.name,
-                        color = MaterialTheme.colorScheme.inversePrimary,
-                        modifier = Modifier
-                            .clickable {  }
-                    ) //here must be hyper-url
+                    if (character.location.name != "unknown") {
+                        Text(
+                            text = character.location.name,
+                            color = MaterialTheme.colorScheme.inversePrimary,
+                            modifier = Modifier
+                                .clickable { onLocationClick(character.location.url.removePrefix("https://rickandmortyapi.com/api/location/").toInt()) }
+                        )
+                    } else {
+                        Text(text = character.location.name, color = MaterialTheme.colorScheme.inversePrimary)
+                    }
                 }
 
                 when(episodesUiState) {
@@ -244,6 +257,8 @@ fun PreviewCharacterDetailsScreenLayout() {
             episodesUiState = EpisodesOfSelectedCharacterUiState.Loading,
             retryAction = {},
             onEpisodeClick = {},
+            onOriginClick = {},
+            onLocationClick = {},
             onBackButtonClick = {},
             character = MockData.mockCharacter
         )

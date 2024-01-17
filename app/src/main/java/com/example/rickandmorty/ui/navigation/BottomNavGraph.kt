@@ -62,6 +62,12 @@ fun BottomNavGraph(
                     onEpisodeClick = { episodeId ->
                         navController.navigate("SelectedEpisode/$episodeId")
                     },
+                    onOriginClick = { originId ->
+                        navController.navigate("SelectedLocation/$originId")
+                    },
+                    onLocationClick = { locationId ->
+                        navController.navigate("SelectedLocation/$locationId")
+                    },
                     onBackButtonClick = {
                         try {
                             navController.navigate(navController.previousBackStackEntry?.destination?.route!!)
