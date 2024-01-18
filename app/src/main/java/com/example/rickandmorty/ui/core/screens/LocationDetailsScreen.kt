@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -51,7 +53,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LocationDetailsScreen(
-    modifier: Modifier = Modifier,
     locationDetailsViewModel: LocationDetailsViewModel = viewModel(factory = LocationDetailsViewModel.Factory),
     selectedLocationId: Int,
     onCharacterClick: (Int) -> Unit,
@@ -104,14 +105,21 @@ fun LocationDetailsScreenLayout(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(4.dp)
+                    .height(50.dp)
+                    .padding(8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    modifier = Modifier.clickable { onBackButtonClick() }
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clickable { onBackButtonClick() }
                 )
-                Text(text = location.name)
+                Text(
+                    text = location.name,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
         }
     ) { innerPadding ->
@@ -121,10 +129,62 @@ fun LocationDetailsScreenLayout(
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = "Identity document: " + location.id)
-                Text(text = "Name: " + location.name)
-                Text(text = "Type: " + location.type.ifEmpty { "*none*" })
-                Text(text = "Dimension: " + location.dimension.ifEmpty { "*none*" })
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Identity document: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(location.id.toString())
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Name: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(location.name)
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Type: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(location.type.ifEmpty { "*none*" })
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Dimension: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(location.dimension.ifEmpty { "*none*" })
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Character(s) on this location:",
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(4.dp),
+                    fontSize = 18.sp
+                )
 
                 when(charactersUiState) {
                     is CharactersOfSelectedLocationUiState.Loading -> LoadingScreen()
@@ -153,8 +213,7 @@ fun LocationDetailsScreenLayout(
 @Composable
 fun LocationDetailsCharacterCard(
     character: Character,
-    onCharacterClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    onCharacterClick: (Int) -> Unit
 ) {
     Card (
         modifier = Modifier

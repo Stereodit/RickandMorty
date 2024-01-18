@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -51,7 +53,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EpisodeDetailsScreen(
-    modifier: Modifier = Modifier,
     episodeDetailsViewModel: EpisodeDetailsViewModel = viewModel(factory = EpisodeDetailsViewModel.Factory),
     selectedEpisodeId: Int,
     onCharacterClick: (Int) -> Unit,
@@ -104,14 +105,21 @@ fun EpisodeDetailsScreenLayout(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(4.dp)
+                    .height(50.dp)
+                    .padding(8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    modifier = Modifier.clickable { onBackButtonClick() }
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clickable { onBackButtonClick() }
                 )
-                Text(text = episode.episode)
+                Text(
+                    text = episode.episode,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
         }
     ) { innerPadding ->
@@ -121,10 +129,61 @@ fun EpisodeDetailsScreenLayout(
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = "Identity document: " + episode.id)
-                Text(text = "Name: " + episode.name)
-                Text(text = "Episode: " + episode.episode)
-                Text(text = "Air date: " + episode.airDate)
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(8.dp)) {
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Identity document: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(episode.id.toString())
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Name: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(episode.name)
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Episode: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(episode.episode)
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Air date: ")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(episode.airDate)
+                                }
+                            },
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Characters in this episode:",
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(4.dp),
+                    fontSize = 18.sp
+                )
 
                 when(charactersUiState) {
                     is CharactersOfSelectedEpisodeUiState.Loading -> LoadingScreen()
@@ -153,8 +212,7 @@ fun EpisodeDetailsScreenLayout(
 @Composable
 fun EpisodeDetailsCharacterCard(
     character: Character,
-    onCharacterClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    onCharacterClick: (Int) -> Unit
 ) {
     Card (
         modifier = Modifier
